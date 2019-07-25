@@ -6,8 +6,7 @@ const url = require('url');
 const proxy_params = require('./private/forwarded-proxy');
 
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('okay');
+  res.end("Only HTTPS supported at the moment");
 });
 
 server.on('connect', (client_req, client_socket, client_head) => {
