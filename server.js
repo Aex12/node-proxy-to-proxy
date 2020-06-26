@@ -3,17 +3,24 @@
 const http = require('http');
 const net = require('net');
 const url = require('url');
-const proxy_params = require('./private/forwarded-proxy');
+
+const roundRobin = require('./utils/roundrobin');
+const proxies_array = require('./private/forwarded-proxies');
+const nextProxy = roundRobin(proxies_array);
 
 const server = http.createServer((req, res) => {
   res.end("Only HTTPS supported at the moment");
 });
 
 server.on('connect', (client_req, client_socket, client_head) => {
+  console.log(client_socket.remoteAddress, client_req.url);
+
   const proxyErrorHandler = (err) => {
     console.error(err.message);
     client_socket && client_socket.end(`HTTP/1.1 500 ${err.message}\r\n`);
   };
+
+  const proxy_params = nextProxy();
   
   const options = {
     port: proxy_params.port,
